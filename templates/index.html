@@ -19,11 +19,11 @@
     <p>Visor DICOM Tridimensional Avanzado</p>
   </header>
 
-  <form id="uploadForm" enctype="multipart/form-data">
-    <input type="text" name="session_id" placeholder="ID de sesión" required>
-    <input type="file" name="dicoms" accept=".zip" required>
-    <button type="submit">📂 Subir Serie DICOM</button>
-  </form>
+<form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+  <input type="text" name="session_id" placeholder="ID de sesión" required>
+  <input type="file" name="dicoms" accept=".zip" required>
+  <button type="submit">📂 Subir Serie DICOM</button>
+</form>
 
   <section id="controls">
     <div class="nav">
