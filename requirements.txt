@@ -1,0 +1,8 @@
+Flask
+SimpleITK
+numpy
+pydicom
+scikit-image
+scipy
+matplotlib
+gunicorn
