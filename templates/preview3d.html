@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Previsualización 3D — Scan&amp;Care</title>
+  <style>
+    body, html { margin:0; width:100%; height:100%; overflow:hidden; background:#000; }
+    #viewer3d { width:100%; height:100%; }
+  </style>
+  <!-- Three.js y extensiones -->
+  <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://unpkg.com/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
+</head>
+<body>
+  <div id="viewer3d"></div>
+
+  <script>
+    // Parámetros de la página
+    const STL_URL = "{{ stl_url }}";
+
+    // Escena, cámara y renderizador
+    const scene    = new THREE.Scene();
+    const camera   = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById("viewer3d").appendChild(renderer.domElement);
+
+    // Luz
+    const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+    light1.position.set(1,1,1);
+    scene.add(light1);
+    scene.add(new THREE.AmbientLight(0x404040, 0.5));
+
+    // Controles de órbita
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.1;
+
+    // Carga del STL
+    const loader = new THREE.STLLoader();
+    loader.load(STL_URL, geometry => {
+      const material = new THREE.MeshPhongMaterial({
+        color: 0x00aaff,
+        specular: 0x111111,
+        shininess: 200
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.rotation.set(-Math.PI/2, 0, 0);
+      mesh.scale.set(0.5,0.5,0.5);
+      scene.add(mesh);
+
+      // Ajustar cámara para encuadrar
+      const box = new THREE.Box3().setFromObject(mesh);
+      const size = box.getSize(new THREE.Vector3()).length();
+      const center = box.getCenter(new THREE.Vector3());
+      camera.position.copy(center).add(new THREE.Vector3(size, size, size));
+      camera.lookAt(center);
+    });
+
+    // Render loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // manejo resize
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
